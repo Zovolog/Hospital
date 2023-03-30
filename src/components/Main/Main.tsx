@@ -8,9 +8,9 @@ import { Map } from "../Map/Map";
 export const Main: React.FC = () => {
   const [info, showInfo] = useState(false);
   const markers = [
-    { id: 1, lat: 37.7749, lng: -122.4194 },
-    { id: 2, lat: 37.7748, lng: -122.4195 },
-    { id: 3, lat: 37.7747, lng: -122.4196 },
+    { id: 1, lat: 41.40338, lng: 2.17403 },
+    { id: 2, lat: 52.277500643035424, lng: 20.983778727788547 },
+    { id: 3, lat: 48.296646506018455, lng: 35.929471202584345 },
   ];
   return (
     <div className="main-wrapper">
@@ -83,13 +83,9 @@ export const Main: React.FC = () => {
             ) : (
               <div className="main-map-info-block-map">
                 <Map
-                  containerElement={<div style={{ height: "400px" }} />}
-                  mapElement={<div style={{ height: "100%" }} />}
                   defaultZoom={8}
                   defaultCenter={{ lat: 37.7749, lng: -122.4194 }}
                   markers={markers}
-                  googleMapURL="https://maps.googleapis.com/maps/api/js?key=AIzaSyCxTs3qwXrNWl4HZhjSDxxAFKfYGoyBdmM&v=3.exp&libraries=geometry,drawing,places"
-                  loadingElement={<div style={{ height: `100%` }} />}
                 />
               </div>
             )}
