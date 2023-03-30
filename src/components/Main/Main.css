@@ -1,0 +1,68 @@
+.main-wrapper {
+  width: 90%;
+  margin: 10vh auto;
+}
+.main-logo {
+  height: 10vh;
+}
+.main-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+#outlined-basic {
+  width: 45vw;
+}
+.main-input {
+  margin-left: 1rem;
+}
+.main-icon {
+  transform: rotate(90deg);
+  width: 3rem;
+}
+.main-search-input {
+  display: flex;
+  align-items: center;
+}
+.main-radio-block {
+  margin-top: 1rem;
+  width: 86%;
+  margin: 0 auto;
+}
+.main-main-content {
+  width: 100%;
+  display: flex;
+  margin-top: 2rem;
+}
+.main-list-hospital {
+  width: 50%;
+  height: 10vh;
+  background-color: antiquewhite;
+}
+.main-map-info-block {
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  margin-left: 1.5rem;
+}
+.main-map-info-block-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.main-map-info-block-header-element {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 50%;
+  height: 10vh;
+  background-color: gray;
+  font-size: 2rem;
+  font-weight: 700;
+  border: 3px solid black;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+.main-map-info-block-header-element:focus {
+  background-color: #12b886;
+}
