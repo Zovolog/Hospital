@@ -186,18 +186,15 @@ export const Main: React.FC = () => {
           </div>
           <div>
             {info ? (
-              <div className="main-map-info-block-info">
+              <div>
                 {infoAboutClinic ? (
-                  <div>
+                  <div className="main-map-info-block-info">
                     <p className="text-l">{infoAboutClinic.clinic_name}</p>
-                    <div>
+                    <div className="main-map-info-block-info-row">
                       <p className="text-m">{infoAboutClinic.suburb_name}</p>
                       <p className="text-m">{infoAboutClinic.email}</p>
                     </div>
-                    <p className="text-m">
-                      {infoAboutClinic.meta_description}
-                      {infoAboutClinic.lat}
-                    </p>
+                    <p className="text-m">{infoAboutClinic.meta_description}</p>
                   </div>
                 ) : (
                   <p>No info!</p>
@@ -208,7 +205,7 @@ export const Main: React.FC = () => {
                 {infoAboutClinic?.lng ? (
                   <div>
                     <Map
-                      defaultZoom={15}
+                      defaultZoom={18}
                       defaultCenter={{
                         lat: infoAboutClinic?.lat,
                         lng: infoAboutClinic?.lng,
