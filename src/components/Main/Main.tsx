@@ -3,15 +3,68 @@ import logo from "./logo.jpg";
 import TextField from "@mui/material/TextField";
 import "./Main.css";
 import { RadioGroup, FormControlLabel, Radio } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Map } from "../Map/Map";
+import axios from "axios";
+
+interface info {
+  meta_description: string;
+  clinic_name: string;
+  email: string;
+  suburb_name: string;
+  lat: any;
+  lng: any;
+}
 export const Main: React.FC = () => {
   const [info, showInfo] = useState(false);
-  const markers = [
-    { id: 1, lat: 41.40338, lng: 2.17403 },
-    { id: 2, lat: 52.277500643035424, lng: 20.983778727788547 },
-    { id: 3, lat: 48.296646506018455, lng: 35.929471202584345 },
-  ];
+  const [key, getKey] = useState("");
+  const [typeOfRequest, gettypeOfRequest] = useState("");
+  const [name, getName] = useState("");
+  const [data, setData] = useState([]);
+  const [infoAboutClinic, getinfoAboutClinic] = useState<info | null>(null);
+
+  const sendRequest = (
+    keyWord: string,
+    nameOfRequest: string,
+    point: string
+  ) => {
+    axios
+      .post("https://clinics-5wjo.onrender.com/api", {
+        query: `
+        query ($${keyWord}: String!) {
+          ${nameOfRequest}(${keyWord}: $${keyWord}) {
+              long_name_version
+              pms
+              meta_title
+              meta_description
+              clinic_slug
+              website
+              clinic_name
+              display_on_web
+              link_to_clinic_suburb_page
+              full_address
+              city_name
+              suburb_name
+              state
+              postcode
+              email
+              phone
+              lat
+              lng
+            }
+          }
+        `,
+        variables: {
+          [keyWord]: point,
+        },
+      })
+      .then((response) => {
+        console.log(response.data.data[nameOfRequest]);
+        setData(response.data.data[nameOfRequest]);
+      });
+  };
+  useEffect(() => {}, []);
+
   return (
     <div className="main-wrapper">
       <div className="main-header">
@@ -23,6 +76,15 @@ export const Main: React.FC = () => {
                 id="outlined-basic"
                 label="Type keyword..."
                 variant="outlined"
+                onChange={(e) => {
+                  getName(e.currentTarget.value);
+                }}
+                onKeyDown={(ev) => {
+                  if (ev.keyCode === 13 && name && key) {
+                    sendRequest(key, typeOfRequest, name);
+                    console.log(key, typeOfRequest, name);
+                  }
+                }}
               />
             </div>
           </div>
@@ -31,23 +93,36 @@ export const Main: React.FC = () => {
               aria-labelledby="demo-radio-buttons-group-label"
               name="radio-buttons-group"
               row
+              onChange={(e) => {
+                getKey(e.currentTarget.value.split(" ")[0]);
+                gettypeOfRequest(e.currentTarget.value.split(" ")[1]);
+              }}
             >
-              <FormControlLabel value="city" control={<Radio />} label="City" />
               <FormControlLabel
-                value="state"
+                value="cityName searchByCity"
+                control={<Radio />}
+                label="City Name"
+              />
+              <FormControlLabel
+                value="postCode searchByPostCode"
+                control={<Radio />}
+                label="Post Code"
+              />
+
+              <FormControlLabel
+                value="stateName searchByState"
                 control={<Radio />}
                 label="State"
               />
-              <FormControlLabel value="zip" control={<Radio />} label="ZIP" />
               <FormControlLabel
-                value="name"
+                value="slugName searchBySlug"
                 control={<Radio />}
-                label="Clinic name"
+                label="Slug"
               />
               <FormControlLabel
-                value="suburb"
+                value="clinicName searchByClinicName"
                 control={<Radio />}
-                label="Suburb"
+                label="Name of clinic"
               />
             </RadioGroup>
           </div>
@@ -55,7 +130,39 @@ export const Main: React.FC = () => {
         <img src={logo} alt="logo" className="main-logo" />
       </div>
       <div className="main-main-content">
-        <div className="main-list-hospital"></div>
+        <div className="main-list-hospital">
+          {data.length != 0 ? (
+            <div>
+              {" "}
+              {data.map((item: any, i) => (
+                <div
+                  key={i}
+                  className="main-list-hospital-item"
+                  tabIndex={0}
+                  onClick={(e) => {
+                    getinfoAboutClinic(item);
+                  }}
+                >
+                  <p className="text-l">{item.clinic_name}</p>
+                  <p className="text-m">{item.full_address}</p>
+                  <div className="main-list-hospital-item-info">
+                    {item.display_on_web === "Yes" ? (
+                      <a href={item.website} className="link">
+                        {item.website}
+                      </a>
+                    ) : (
+                      <p>No website for this clinic</p>
+                    )}
+
+                    <p className="text-m">p.{item.phone}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div>No result!</div>
+          )}
+        </div>
         <div className="main-map-info-block">
           <div className="main-map-info-block-header">
             <div
@@ -79,14 +186,48 @@ export const Main: React.FC = () => {
           </div>
           <div>
             {info ? (
-              <div className="main-map-info-block-info">Hello!</div>
+              <div className="main-map-info-block-info">
+                {infoAboutClinic ? (
+                  <div>
+                    <p className="text-l">{infoAboutClinic.clinic_name}</p>
+                    <div>
+                      <p className="text-m">{infoAboutClinic.suburb_name}</p>
+                      <p className="text-m">{infoAboutClinic.email}</p>
+                    </div>
+                    <p className="text-m">
+                      {infoAboutClinic.meta_description}
+                      {infoAboutClinic.lat}
+                    </p>
+                  </div>
+                ) : (
+                  <p>No info!</p>
+                )}
+              </div>
             ) : (
               <div className="main-map-info-block-map">
-                <Map
-                  defaultZoom={8}
-                  defaultCenter={{ lat: 37.7749, lng: -122.4194 }}
-                  markers={markers}
-                />
+                {infoAboutClinic?.lng ? (
+                  <div>
+                    <Map
+                      defaultZoom={15}
+                      defaultCenter={{
+                        lat: infoAboutClinic?.lat,
+                        lng: infoAboutClinic?.lng,
+                      }}
+                      markers={data}
+                    />
+                  </div>
+                ) : (
+                  <div>
+                    <Map
+                      defaultZoom={4}
+                      defaultCenter={{
+                        lat: -25.48796477368385,
+                        lng: 134.1424367952019,
+                      }}
+                      markers={data}
+                    />
+                  </div>
+                )}
               </div>
             )}
           </div>

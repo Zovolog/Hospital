@@ -1,5 +1,5 @@
-import { GoogleMap, MarkerF, useLoadScript } from "@react-google-maps/api";
-import { FC } from "react";
+import { GoogleMap, Marker, useLoadScript } from "@react-google-maps/api";
+import { FC, useEffect } from "react";
 
 interface MapProps {
   defaultZoom: number;
@@ -16,9 +16,11 @@ export const Map: FC<MapProps> = ({
     googleMapsApiKey: "AIzaSyCxTs3qwXrNWl4HZhjSDxxAFKfYGoyBdmM",
   });
   const containerStyle = {
-    width: "calc(100% - 2rem)",
+    width: "100%",
     height: "480px",
   };
+
+  useEffect(() => {}, []);
   if (!isLoaded) return <p>NO WAY</p>;
   return (
     <GoogleMap
@@ -29,10 +31,11 @@ export const Map: FC<MapProps> = ({
         lng: defaultCenter.lng,
       }}
     >
-      {markers.map((marker: any) => (
-        <MarkerF
+      {markers.map((marker: any, i) => (
+        <Marker
           position={{ lat: marker.lat, lng: marker.lng }}
-          key={marker.id}
+          key={i}
+          icon={"https://cdn-icons-png.flaticon.com/32/4812/4812047.png"}
         />
       ))}
     </GoogleMap>

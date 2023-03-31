@@ -36,9 +36,8 @@
 }
 .main-list-hospital {
   width: 50%;
-  height: 10vh;
-  background-color: antiquewhite;
 }
+
 .main-map-info-block {
   width: 50%;
   display: flex;
@@ -65,4 +64,21 @@
 }
 .main-map-info-block-header-element:focus {
   background-color: #12b886;
+}
+.main-list-hospital {
+  height: 600px;
+  overflow: auto;
+}
+.main-list-hospital-item {
+  margin-top: 0.5rem;
+  padding: 1rem;
+  cursor: pointer;
+  background-color: gray;
+}
+.main-list-hospital-item:focus {
+  background-color: #12b886;
+}
+.main-list-hospital-item-info {
+  display: flex;
+  justify-content: space-between;
 }
