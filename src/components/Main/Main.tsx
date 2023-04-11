@@ -2,7 +2,7 @@ import "./Main.css";
 import "./radio.css";
 import { useEffect, useState } from "react";
 import { Map } from "../Map/Map";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 interface info {
@@ -14,6 +14,10 @@ interface info {
   lng: any;
 }
 export const Main: React.FC = () => {
+  const location = useLocation();
+  const keyWord = new URLSearchParams(location.search).get("param");
+  const nameWord = new URLSearchParams(location.search).get("key");
+  const typeWord = new URLSearchParams(location.search).get("type");
   const [info, showInfo] = useState(false);
   const [key, getKey] = useState("cityName");
   const [typeOfRequest, gettypeOfRequest] = useState("searchByCity");
@@ -24,7 +28,9 @@ export const Main: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    
+    if (keyWord && nameWord && typeWord) {
+      sendRequest(keyWord, typeWord, nameWord);
+    }
   }, []);
 
   const sendRequest = (
@@ -89,7 +95,9 @@ export const Main: React.FC = () => {
                 onKeyDown={(ev) => {
                   if (ev.keyCode === 13 && name && key) {
                     sendRequest(key, typeOfRequest, name);
-                    navigate(`/param=:${key}&key=:${name}`);
+                    navigate(
+                      `/?type=${typeOfRequest}&param=${key}&key=${name}`
+                    );
                     console.log(key, typeOfRequest, name);
                   }
                 }}
@@ -99,7 +107,9 @@ export const Main: React.FC = () => {
                 onClick={(ev) => {
                   if (name && key) {
                     sendRequest(key, typeOfRequest, name);
-                    navigate(`/param=:/${key}&key=:/${name}`);
+                    navigate(
+                      `/?type=${typeOfRequest}&param=${key}&key=${name}`
+                    );
                     console.log(key, typeOfRequest, name);
                   }
                 }}
