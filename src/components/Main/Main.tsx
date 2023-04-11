@@ -1,10 +1,8 @@
-import icon from "./search.svg";
-import logo from "./logo.jpg";
-import TextField from "@mui/material/TextField";
 import "./Main.css";
-import { RadioGroup, FormControlLabel, Radio } from "@mui/material";
+import "./radio.css";
 import { useEffect, useState } from "react";
 import { Map } from "../Map/Map";
+import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 
 interface info {
@@ -17,11 +15,17 @@ interface info {
 }
 export const Main: React.FC = () => {
   const [info, showInfo] = useState(false);
-  const [key, getKey] = useState("");
-  const [typeOfRequest, gettypeOfRequest] = useState("");
+  const [key, getKey] = useState("cityName");
+  const [typeOfRequest, gettypeOfRequest] = useState("searchByCity");
   const [name, getName] = useState("");
   const [data, setData] = useState([]);
   const [infoAboutClinic, getinfoAboutClinic] = useState<info | null>(null);
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    
+  }, []);
 
   const sendRequest = (
     keyWord: string,
@@ -29,7 +33,7 @@ export const Main: React.FC = () => {
     point: string
   ) => {
     axios
-      .post("https://clinics-5wjo.onrender.com/api", {
+      .post("https://clinics-v3kk.onrender.com/api", {
         query: `
         query ($${keyWord}: String!) {
           ${nameOfRequest}(${keyWord}: $${keyWord}) {
@@ -63,75 +67,105 @@ export const Main: React.FC = () => {
         setData(response.data.data[nameOfRequest]);
       });
   };
-  useEffect(() => {}, []);
+
+  const gettingValue = (e: any) => {
+    getKey(e.currentTarget.value.split(" ")[0]);
+    gettypeOfRequest(e.currentTarget.value.split(" ")[1]);
+  };
 
   return (
     <div className="main-wrapper">
       <div className="main-header">
         <div className="main-search-block">
           <div className="main-search-input">
-            <img src={icon} alt="logo" className="main-icon" />
             <div className="main-input">
-              <TextField
-                id="outlined-basic"
-                label="Type keyword..."
-                variant="outlined"
+              <input
+                type="text"
+                placeholder="Type keyword..."
+                className="text-field"
                 onChange={(e) => {
                   getName(e.currentTarget.value);
                 }}
                 onKeyDown={(ev) => {
                   if (ev.keyCode === 13 && name && key) {
                     sendRequest(key, typeOfRequest, name);
+                    navigate(`/param=:${key}&key=:${name}`);
                     console.log(key, typeOfRequest, name);
                   }
                 }}
               />
+              <button
+                className="bt-search"
+                onClick={(ev) => {
+                  if (name && key) {
+                    sendRequest(key, typeOfRequest, name);
+                    navigate(`/param=:/${key}&key=:/${name}`);
+                    console.log(key, typeOfRequest, name);
+                  }
+                }}
+              >
+                Search clinics
+              </button>
             </div>
           </div>
           <div className="main-radio-block ">
-            <RadioGroup
-              aria-labelledby="demo-radio-buttons-group-label"
-              name="radio-buttons-group"
-              row
-              onChange={(e) => {
-                getKey(e.currentTarget.value.split(" ")[0]);
-                gettypeOfRequest(e.currentTarget.value.split(" ")[1]);
-              }}
-            >
-              <FormControlLabel
+            <p className="input-block">
+              <input
+                type="radio"
+                id="CityName"
+                name="radio-group"
+                defaultChecked
                 value="cityName searchByCity"
-                control={<Radio />}
-                label="City Name"
+                onChange={(e) => gettingValue(e)}
               />
-              <FormControlLabel
+              <label htmlFor="CityName">City Name</label>
+            </p>
+            <p className="input-block">
+              <input
+                type="radio"
+                id="PostCode"
+                name="radio-group"
                 value="postCode searchByPostCode"
-                control={<Radio />}
-                label="Post Code"
+                onChange={(e) => gettingValue(e)}
               />
-
-              <FormControlLabel
+              <label htmlFor="PostCode">Post Code</label>
+            </p>
+            <p className="input-block">
+              <input
+                type="radio"
+                id="State"
+                name="radio-group"
                 value="stateName searchByState"
-                control={<Radio />}
-                label="State"
+                onChange={(e) => gettingValue(e)}
               />
-              <FormControlLabel
+              <label htmlFor="State">State</label>
+            </p>
+            <p className="input-block">
+              <input
+                type="radio"
+                id="Slug"
+                name="radio-group"
                 value="slugName searchBySlug"
-                control={<Radio />}
-                label="Slug"
+                onChange={(e) => gettingValue(e)}
               />
-              <FormControlLabel
+              <label htmlFor="Slug">Slug</label>
+            </p>
+            <p className="input-block">
+              <input
+                type="radio"
+                id="NameOfClinic"
+                name="radio-group"
                 value="clinicName searchByClinicName"
-                control={<Radio />}
-                label="Name of clinic"
+                onChange={(e) => gettingValue(e)}
               />
-            </RadioGroup>
+              <label htmlFor="NameOfClinic">Clinic name</label>
+            </p>
           </div>
         </div>
-        <img src={logo} alt="logo" className="main-logo" />
       </div>
       <div className="main-main-content">
         <div className="main-list-hospital">
-          {data.length != 0 ? (
+          {data.length !== 0 ? (
             <div>
               {" "}
               {data.map((item: any, i) => (
@@ -160,7 +194,7 @@ export const Main: React.FC = () => {
               ))}
             </div>
           ) : (
-            <div>No result!</div>
+            <p className="text-l">No result!</p>
           )}
         </div>
         <div className="main-map-info-block">
@@ -197,7 +231,9 @@ export const Main: React.FC = () => {
                     <p className="text-m">{infoAboutClinic.meta_description}</p>
                   </div>
                 ) : (
-                  <p>No info!</p>
+                  <div className="main-map-info-block-no-info">
+                    <p className="text-l">Pls select a clinic</p>
+                  </div>
                 )}
               </div>
             ) : (
@@ -211,6 +247,7 @@ export const Main: React.FC = () => {
                         lng: infoAboutClinic?.lng,
                       }}
                       markers={data}
+                      info={infoAboutClinic?.clinic_name}
                     />
                   </div>
                 ) : (
@@ -222,6 +259,7 @@ export const Main: React.FC = () => {
                         lng: 134.1424367952019,
                       }}
                       markers={data}
+                      info=""
                     />
                   </div>
                 )}

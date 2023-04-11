@@ -1,10 +1,21 @@
-import { GoogleMap, Marker, useLoadScript } from "@react-google-maps/api";
-import { FC, useEffect } from "react";
+import {
+  GoogleMap,
+  Marker,
+  useLoadScript,
+  InfoWindow,
+} from "@react-google-maps/api";
+import { FC, useState } from "react";
 
 interface MapProps {
   defaultZoom: number;
   defaultCenter: { lat: number; lng: number };
   markers: { id: number; lat: number; lng: number }[];
+  info: string;
+}
+interface selectedMarker {
+  clinic_name: string;
+  lat: number;
+  lng: number;
 }
 
 export const Map: FC<MapProps> = ({
@@ -12,6 +23,9 @@ export const Map: FC<MapProps> = ({
   defaultCenter,
   markers,
 }: MapProps) => {
+  const [selectedMarker, setSelectedMarker] = useState<selectedMarker | null>(
+    null
+  );
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: "AIzaSyCxTs3qwXrNWl4HZhjSDxxAFKfYGoyBdmM",
   });
@@ -20,7 +34,9 @@ export const Map: FC<MapProps> = ({
     height: "480px",
   };
 
-  useEffect(() => {}, []);
+  const handleMarkerClick = (marker: any) => {
+    setSelectedMarker(marker);
+  };
   if (!isLoaded) return <p>NO WAY</p>;
   return (
     <GoogleMap
@@ -36,8 +52,19 @@ export const Map: FC<MapProps> = ({
           position={{ lat: marker.lat, lng: marker.lng }}
           key={i}
           icon={"https://cdn-icons-png.flaticon.com/32/4812/4812047.png"}
+          onClick={() => handleMarkerClick(marker)}
+          title={marker.clinic_name}
+          zIndex={1}
         />
       ))}
+      {selectedMarker && (
+        <InfoWindow
+          position={{ lat: selectedMarker.lat, lng: selectedMarker.lng }}
+          onCloseClick={() => setSelectedMarker(null)}
+        >
+          <div>{selectedMarker.clinic_name}</div>
+        </InfoWindow>
+      )}
     </GoogleMap>
   );
 };
