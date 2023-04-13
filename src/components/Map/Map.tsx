@@ -4,13 +4,13 @@ import {
   useLoadScript,
   InfoWindow,
 } from "@react-google-maps/api";
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 
 interface MapProps {
   defaultZoom: number;
   defaultCenter: { lat: number; lng: number };
   markers: { id: number; lat: number; lng: number }[];
-  info: string;
+  markerInfo: any;
 }
 interface selectedMarker {
   clinic_name: string;
@@ -22,10 +22,16 @@ export const Map: FC<MapProps> = ({
   defaultZoom,
   defaultCenter,
   markers,
+  markerInfo,
 }: MapProps) => {
   const [selectedMarker, setSelectedMarker] = useState<selectedMarker | null>(
     null
   );
+  useEffect(() => {
+    if (markerInfo) {
+      setSelectedMarker(markerInfo);
+    }
+  }, [defaultCenter]);
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: "AIzaSyCxTs3qwXrNWl4HZhjSDxxAFKfYGoyBdmM",
   });
@@ -34,9 +40,6 @@ export const Map: FC<MapProps> = ({
     height: "480px",
   };
 
-  const handleMarkerClick = (marker: any) => {
-    setSelectedMarker(marker);
-  };
   if (!isLoaded) return <p>NO WAY</p>;
   return (
     <GoogleMap
@@ -51,16 +54,29 @@ export const Map: FC<MapProps> = ({
         <Marker
           position={{ lat: marker.lat, lng: marker.lng }}
           key={i}
-          icon={"https://cdn-icons-png.flaticon.com/32/4812/4812047.png"}
-          onClick={() => handleMarkerClick(marker)}
+          icon={
+            selectedMarker &&
+            selectedMarker.lat === marker.lat &&
+            selectedMarker.lng === marker.lng
+              ? {
+                  url: "https://cdn-icons-png.flaticon.com/64/4812/4812047.png",
+                  scaledSize: new window.google.maps.Size(70, 70),
+                }
+              : ""
+          }
+          onClick={() => {
+            setSelectedMarker(marker);
+          }}
           title={marker.clinic_name}
-          zIndex={1}
         />
       ))}
       {selectedMarker && (
         <InfoWindow
           position={{ lat: selectedMarker.lat, lng: selectedMarker.lng }}
           onCloseClick={() => setSelectedMarker(null)}
+          options={{
+            pixelOffset: new google.maps.Size(0, -40),
+          }}
         >
           <div>{selectedMarker.clinic_name}</div>
         </InfoWindow>

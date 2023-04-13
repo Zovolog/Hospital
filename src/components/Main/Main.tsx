@@ -1,5 +1,6 @@
 import "./Main.css";
 import "./radio.css";
+import "./loader.css";
 import { useEffect, useState } from "react";
 import { Map } from "../Map/Map";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -19,6 +20,7 @@ export const Main: React.FC = () => {
   const nameWord = new URLSearchParams(location.search).get("key");
   const typeWord = new URLSearchParams(location.search).get("type");
   const [info, showInfo] = useState(false);
+  const [loading, showLoading] = useState(false);
   const [key, getKey] = useState("cityName");
   const [typeOfRequest, gettypeOfRequest] = useState("searchByCity");
   const [name, getName] = useState("");
@@ -30,6 +32,7 @@ export const Main: React.FC = () => {
   useEffect(() => {
     if (keyWord && nameWord && typeWord) {
       sendRequest(keyWord, typeWord, nameWord);
+      getName(nameWord);
     }
   }, []);
 
@@ -38,6 +41,7 @@ export const Main: React.FC = () => {
     nameOfRequest: string,
     point: string
   ) => {
+    showLoading(true);
     axios
       .post("https://clinics-v3kk.onrender.com/api", {
         query: `
@@ -69,8 +73,8 @@ export const Main: React.FC = () => {
         },
       })
       .then((response) => {
-        console.log(response.data.data[nameOfRequest]);
         setData(response.data.data[nameOfRequest]);
+        showLoading(false);
       });
   };
 
@@ -98,10 +102,25 @@ export const Main: React.FC = () => {
                     navigate(
                       `/?type=${typeOfRequest}&param=${key}&key=${name}`
                     );
-                    console.log(key, typeOfRequest, name);
                   }
                 }}
+                value={name}
               />
+              {loading ? (
+                <div className="lds-roller">
+                  <div></div>
+                  <div></div>
+                  <div></div>
+                  <div></div>
+                  <div></div>
+                  <div></div>
+                  <div></div>
+                  <div></div>
+                </div>
+              ) : (
+                <div></div>
+              )}
+
               <button
                 className="bt-search"
                 onClick={(ev) => {
@@ -110,7 +129,6 @@ export const Main: React.FC = () => {
                     navigate(
                       `/?type=${typeOfRequest}&param=${key}&key=${name}`
                     );
-                    console.log(key, typeOfRequest, name);
                   }
                 }}
               >
@@ -257,7 +275,7 @@ export const Main: React.FC = () => {
                         lng: infoAboutClinic?.lng,
                       }}
                       markers={data}
-                      info={infoAboutClinic?.clinic_name}
+                      markerInfo={infoAboutClinic}
                     />
                   </div>
                 ) : (
@@ -269,7 +287,7 @@ export const Main: React.FC = () => {
                         lng: 134.1424367952019,
                       }}
                       markers={data}
-                      info=""
+                      markerInfo={null}
                     />
                   </div>
                 )}
