@@ -47,7 +47,6 @@
   font-size: 1.3rem;
 }
 .main-radio-block {
-  width: 90%;
   display: flex;
   justify-content: space-between;
   margin: 1rem auto;
@@ -86,6 +85,9 @@
 .main-map-info-block-header-element:focus {
   background-color: #12b886;
 }
+.green {
+  background-color: #12b886;
+}
 .main-map-info-block-info {
   background-color: rgb(220, 220, 220);
   padding: 1rem;
@@ -114,7 +116,7 @@
   border-radius: 5px;
   border: 1px solid black;
 }
-.main-list-hospital-item:focus {
+.green {
   background-color: #12b886;
 }
 .main-list-hospital-item-info {

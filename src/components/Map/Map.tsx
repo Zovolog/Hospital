@@ -4,8 +4,9 @@ import {
   useLoadScript,
   InfoWindow,
 } from "@react-google-maps/api";
-import { FC, useEffect, useState } from "react";
+import { FC, useContext, useEffect, useState } from "react";
 
+import { link } from "../../App";
 interface MapProps {
   defaultZoom: number;
   defaultCenter: { lat: number; lng: number };
@@ -27,11 +28,15 @@ export const Map: FC<MapProps> = ({
   const [selectedMarker, setSelectedMarker] = useState<selectedMarker | null>(
     null
   );
+
+  const { activeLinkFromMap, getActiveLinkFromMap, getInfoMarker } =
+    useContext(link);
   useEffect(() => {
     if (markerInfo) {
       setSelectedMarker(markerInfo);
     }
   }, [defaultCenter]);
+
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: "AIzaSyCxTs3qwXrNWl4HZhjSDxxAFKfYGoyBdmM",
   });
@@ -65,7 +70,10 @@ export const Map: FC<MapProps> = ({
               : ""
           }
           onClick={() => {
+            getActiveLinkFromMap(i);
+            getInfoMarker(marker);
             setSelectedMarker(marker);
+            console.log(marker);
           }}
           title={marker.clinic_name}
         />
@@ -75,7 +83,7 @@ export const Map: FC<MapProps> = ({
           position={{ lat: selectedMarker.lat, lng: selectedMarker.lng }}
           onCloseClick={() => setSelectedMarker(null)}
           options={{
-            pixelOffset: new google.maps.Size(0, -40),
+            pixelOffset: new google.maps.Size(0, -70),
           }}
         >
           <div>{selectedMarker.clinic_name}</div>

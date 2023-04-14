@@ -1,10 +1,18 @@
 import "./Main.css";
 import "./radio.css";
 import "./loader.css";
-import { useEffect, useState } from "react";
+import {
+  useEffect,
+  useState,
+  useRef,
+  createContext,
+  FC,
+  useContext,
+} from "react";
 import { Map } from "../Map/Map";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { link } from "../../App";
 
 interface info {
   meta_description: string;
@@ -14,11 +22,18 @@ interface info {
   lat: any;
   lng: any;
 }
-export const Main: React.FC = () => {
+
+interface mainProps {
+  index: any;
+  marker: any;
+}
+
+export const Main: FC<mainProps> = ({ index, marker }: mainProps) => {
   const location = useLocation();
   const keyWord = new URLSearchParams(location.search).get("param");
   const nameWord = new URLSearchParams(location.search).get("key");
   const typeWord = new URLSearchParams(location.search).get("type");
+  const [activeElement, showActiveElement] = useState<null | Number>(null);
   const [info, showInfo] = useState(false);
   const [loading, showLoading] = useState(false);
   const [key, getKey] = useState("cityName");
@@ -33,9 +48,55 @@ export const Main: React.FC = () => {
     if (keyWord && nameWord && typeWord) {
       sendRequest(keyWord, typeWord, nameWord);
       getName(nameWord);
+    } else {
+      showLoading(true);
+      axios
+        .get("https://clinics-v3kk.onrender.com/api", {
+          params: {
+            query: `
+      query {
+        allClinics {
+          long_name_version
+          pms
+          meta_title
+          meta_description
+          clinic_slug
+          website
+          clinic_name
+          display_on_web
+          link_to_clinic_suburb_page
+          full_address
+          city_name
+          suburb_name
+          state
+          postcode
+          email
+          phone
+          lat
+          lng
+        }
+      }
+    `,
+          },
+        })
+        .then((response) => {
+          console.log(response.data.data.allClinics);
+          setData(response.data.data.allClinics);
+          showLoading(false);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     }
   }, []);
 
+  useEffect(() => {
+    if (index) {
+      showActiveElement(index);
+      getinfoAboutClinic(marker);
+      console.log(marker);
+    }
+  }, [index]);
   const sendRequest = (
     keyWord: string,
     nameOfRequest: string,
@@ -107,33 +168,27 @@ export const Main: React.FC = () => {
                 value={name}
               />
               {loading ? (
-                <div className="lds-roller">
-                  <div></div>
-                  <div></div>
-                  <div></div>
-                  <div></div>
+                <div className="lds-ring">
                   <div></div>
                   <div></div>
                   <div></div>
                   <div></div>
                 </div>
               ) : (
-                <div></div>
+                <button
+                  className="bt-search"
+                  onClick={(ev) => {
+                    if (name && key) {
+                      sendRequest(key, typeOfRequest, name);
+                      navigate(
+                        `/?type=${typeOfRequest}&param=${key}&key=${name}`
+                      );
+                    }
+                  }}
+                >
+                  Search-clinics
+                </button>
               )}
-
-              <button
-                className="bt-search"
-                onClick={(ev) => {
-                  if (name && key) {
-                    sendRequest(key, typeOfRequest, name);
-                    navigate(
-                      `/?type=${typeOfRequest}&param=${key}&key=${name}`
-                    );
-                  }
-                }}
-              >
-                Search clinics
-              </button>
             </div>
           </div>
           <div className="main-radio-block ">
@@ -199,11 +254,17 @@ export const Main: React.FC = () => {
               {data.map((item: any, i) => (
                 <div
                   key={i}
-                  className="main-list-hospital-item"
                   tabIndex={0}
                   onClick={(e) => {
                     getinfoAboutClinic(item);
+                    showActiveElement(i);
+                    console.log(i);
                   }}
+                  className={
+                    activeElement === i
+                      ? "main-list-hospital-item green"
+                      : "main-list-hospital-item"
+                  }
                 >
                   <p className="text-l">{item.clinic_name}</p>
                   <p className="text-m">{item.full_address}</p>
