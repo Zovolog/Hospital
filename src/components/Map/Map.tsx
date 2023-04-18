@@ -29,9 +29,9 @@ export const Map: FC<MapProps> = ({
     null
   );
 
-  const { activeLinkFromMap, getActiveLinkFromMap, getInfoMarker } =
-    useContext(link);
+  const { getActiveLinkFromMap, getInfoMarker } = useContext(link);
   useEffect(() => {
+    setSelectedMarker(null);
     if (markerInfo) {
       setSelectedMarker(markerInfo);
     }

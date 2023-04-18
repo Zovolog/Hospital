@@ -1,18 +1,10 @@
 import "./Main.css";
 import "./radio.css";
 import "./loader.css";
-import {
-  useEffect,
-  useState,
-  useRef,
-  createContext,
-  FC,
-  useContext,
-} from "react";
+import { useEffect, useState, FC } from "react";
 import { Map } from "../Map/Map";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { link } from "../../App";
 
 interface info {
   meta_description: string;
@@ -50,6 +42,7 @@ export const Main: FC<mainProps> = ({ index, marker }: mainProps) => {
       getName(nameWord);
     } else {
       showLoading(true);
+
       axios
         .get("https://clinics-v3kk.onrender.com/api", {
           params: {
@@ -134,6 +127,7 @@ export const Main: FC<mainProps> = ({ index, marker }: mainProps) => {
         },
       })
       .then((response) => {
+        getinfoAboutClinic(null);
         setData(response.data.data[nameOfRequest]);
         showLoading(false);
       });
